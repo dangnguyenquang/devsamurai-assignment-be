@@ -37,17 +37,25 @@ cd fullstack-assignment-be
 Create a `.env` file based on the sample and fill in your database, JWT, and other configuration details.
 
 ```env
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
-DB_DATABASE=fullstack
-DB_PORT=5432
+
+DATABASE_URL="postgresql://postgres:password@localhost:5432/assignment-db?schema=public"
+
 PORT=3000
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=1d
+
+DB_HOST=db
+DB_USERNAME=postgres
+DB_PASSWORD=password
+DB_PORT=5432
+DB_DATABASE=assignment-db
+
 PGADMIN_EMAIL=admin@admin.com
-PGADMIN_PASSWORD=admin
+PGADMIN_PASSWORD=password
 PGADMIN_HOST_PORT=5050
 PGADMIN_CONTAINER_PORT=80
+
+JWT_SECRET=401cf210d729346177f72276fe6b310d
+JWT_EXPIRES_IN=7d
+
 ```
 
 ### 4. Start with Docker
