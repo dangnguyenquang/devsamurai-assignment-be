@@ -1,0 +1,69 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    container_name: boilerplate-postgres
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - '${DB_PORT}:5432'
+    networks:
+      - boilerplate-net
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: boilerplate-app
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@db:5432/${DB_DATABASE}?schema=public
+      - PORT=${PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+    ports:
+      - '${PORT}:${PORT}'
+    depends_on:
+      - db
+    volumes:
+      - ./src:/app/src
+    networks:
+      - boilerplate-net
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/healthCheck']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    container_name: boilerplate-pgadmin
+    env_file:
+      - .env
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - '${PGADMIN_HOST_PORT}:${PGADMIN_CONTAINER_PORT}'
+    depends_on:
+      - db
+    networks:
+      - boilerplate-net
+
+networks:
+  boilerplate-net:
+    driver: bridge
+
